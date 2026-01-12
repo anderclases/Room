@@ -35,10 +35,16 @@ def test1():
     print(generarEntity(package,entityList[0]))
     print("VIEW MODEL")
     print(generarViewModel(package,dbname,entityList[0]))
+    
+    print("MainActivity")
+    print(generarMainActivity(package,dbname,entityList[0]))
 
 
 def roomGenerator():
     package = input("Introduce package: ").strip()
+    # Filtra el package 
+    if(package in "package"):
+        package.replace("package ","")
     dbname = input("Introduce nombre de base de datos: ").strip().capitalize()
 
     print("Inserta nombres de entidad:")
@@ -53,6 +59,10 @@ def roomGenerator():
     createFile(f"{dbname}ViewModel.kt",generarViewModel(package,dbname,entityList[0]))
     createFile(f"app.build.gradle.kts",generarBuildGradleApp(package))
     createFile(f"top.build.gradle.kts",generarBuildGradleTop())
+    createFile(f"{dbname}Repository.kt",generarRepository(package,dbname,entityList[0]))
+    createFile(f"MainActivity",generarMainActivity(package,dbname,entityList[0]))
+
+
     
 
 
@@ -89,7 +99,7 @@ def solicitar_entidades():
 
 def generarEntity(package,entityName):
     return '''
-{0}
+package {0}
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -106,7 +116,7 @@ data class {1}(
     
 def generarDAO(package,entityName):
     return '''
-{0}
+package {0}
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -133,6 +143,12 @@ interface {1}Dao {{
 
     @Delete
     suspend fun delete(entity: {1})
+
+    @Query("""
+        SELECT * FROM {1}
+        WHERE (:titulo IS NULL OR name LIKE '%' || :titulo || '%')
+    """)
+    fun filtrarCoches(titulo: String?): Flow<List<{1}>>
 }}
     '''.format(package,entityName,entityName.lower())
 
@@ -144,7 +160,7 @@ def generarDatabase(package,databaseName, entities):
 
 
     return '''
-{0}
+package {0}
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
@@ -174,7 +190,7 @@ abstract class {3}Database : RoomDatabase() {{
 
 def generarViewModel(package,databaseName, entity):
     return '''
-{0}
+package {0}
 
 import android.app.Application
 import android.util.Log
@@ -185,33 +201,33 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
-class {1}ViewModel(application: Application) : AndroidViewModel(application) {{
-
-    private val {3}Dao = {1}Database.getDatabase(application).{3}Dao()
+class {1}ViewModel(
+    private val repositorio: {1}Repository
+) : ViewModel() {{
 
     fun insert{2}(name: String, price: Double, quantity: Int) {{
         val new{2} = {2}(name = name, price = price, quantity = quantity)
         Log.d("{1}ViewModel", "Nuevo {2} creado: $new{2}")
 
         viewModelScope.launch(Dispatchers.IO) {{
-            {3}Dao.insert(new{2})
+            repositorio.insert(new{2})
             Log.d("{1}ViewModel", "Insert realizado")
         }}
     }}
 
     fun get{2}(id: Int): Flow<{2}> {{
-        return {3}Dao.get{2}(id)
+        return repositorio.get{2}(id)
     }}
 
-    val all{2}s: Flow<List<{2}>> = {3}Dao.getAll{2}s()
+    val all{2}s: Flow<List<{2}>> = repositorio.getAll{2}s()
 
     suspend fun delete({3}: {2}){{
-        {3}Dao.delete({3})
+        repositorio.delete({3})
     }}
 
 
     suspend fun update({3}: {2}){{
-        {3}Dao.update({3})
+        repositorio.update({3})
     }}
 
 }}
@@ -227,21 +243,25 @@ plugins {
 }
     '''
 def generarBuildGradleApp(package):
+
+    projectPath = package.replace("package ","")
+    print("Este es un tu path " + projectPath)
+
     return'''
-plugins {
+plugins {{
     id("com.google.devtools.ksp")
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-}
+}}
 
-android {
+android {{
     namespace = "{0}"
-    compileSdk {
+    compileSdk {{
         version = release(36)
-    }
+    }}
 
-    defaultConfig {
+    defaultConfig {{
         applicationId = "{0}"
         minSdk = 24
         targetSdk = 36
@@ -249,30 +269,30 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
+    }}
 
-    buildTypes {
-        release {
+    buildTypes {{
+        release {{
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-        }
-    }
-    compileOptions {
+        }}
+    }}
+    compileOptions {{
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions {
+    }}
+    kotlinOptions {{
         jvmTarget = "11"
-    }
-    buildFeatures {
+    }}
+    buildFeatures {{
         compose = true
-    }
-}
+    }}
+}}
 
-dependencies {
+dependencies {{
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     val room_version = "2.8.3"
     implementation("androidx.room:room-runtime:$room_version")
@@ -301,9 +321,120 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-}
-    '''.format(package.replace("package ",""))
+}}
+    '''.format(projectPath)
 
+
+def generarRepository(package,dbName,entity):
+    return '''
+package {0}
+
+import {0}.{1}
+import {0}.{2}Dao
+import kotlinx.coroutines.flow.Flow
+
+class {3}Repository(private val dao: {2}Dao) {{
+
+    val todosLos{1}s:Flow<List<{1}>> = dao.getAll{1}s()
+
+    // Insertar un {1}
+    suspend fun insertar{1}({2}: {1}) {{
+        dao.insert({2})
+    }}
+
+    fun get{1}(id: Int): Flow<{1}> {{
+        return dao.get{1}(id)
+    }}
+
+    // Borrar un {1}
+    suspend fun eliminar{1}({2}: {1}) {{
+        dao.delete({2})
+    }}
+
+    // Actualizar un {1} existente
+    suspend fun actualizar{1}({2}: {1}) {{
+        dao.update({2})
+    }}
+
+    fun filtrar{1}s(titulo: String?): Flow<List<{1}>> =
+        dao.filtrar{1}s(titulo)
+}}
+'''.format(package,entity,entity.lower(),dbName)
+
+
+def generarMainActivity(package,dbName,entity):
+    return '''
+package {0}
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import {0}.data.{1}Repository
+import {0}.ui.theme.{3}Theme
+import {0}.ui.shared.{1}ViewModel
+import {0}.ui.ventanas.VentanaEditar
+import {0}.ui.ventanas.VentanaVer
+import {0}.ui.ventanas.VentanaCrear
+
+class MainActivity : ComponentActivity() {{
+    override fun onCreate(savedInstanceState: Bundle?) {{
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContent {{
+            {3}Theme {{
+                Scaffold(modifier = Modifier.fillMaxSize()) {{ innerPadding ->
+                    gestorVentanas(Modifier.padding(innerPadding))
+                }}
+            }}
+        }}
+    }}
+}}
+
+@Composable
+fun gestorVentanas(modifier: Modifier) {{
+    val context = LocalContext.current
+
+    val repositorio = {1}Repository({3}Database.getDatabase(context).{2}Dao())
+
+    val factory = object : androidx.lifecycle.ViewModelProvider.Factory {{
+        override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {{
+            return {1}ViewModel(repositorio) as T
+        }}
+    }}
+
+    val {2}ViewModel: {1}ViewModel = viewModel(factory = factory)
+
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "ver") {{
+
+        composable(
+            route = "editar/{{id}}",
+            arguments = listOf(
+                navArgument("id") {{ type = NavType.IntType }}
+            )
+        ) {{ backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("id") ?: 0
+            VentanaEditar(navController, modifier, {1}ViewModel, id)
+        }}
+
+        composable("ver") {{ VentanaVer(navController, modifier, {2}ViewModel) }}
+        composable("crear") {{ VentanaCrear(navController, modifier, {2}ViewModel) }}
+    }}
+}}
+    '''.format(package,entity,entity.lower(),dbName)
 
 
 

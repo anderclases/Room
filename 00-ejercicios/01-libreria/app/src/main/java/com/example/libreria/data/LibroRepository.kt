@@ -17,7 +17,6 @@ class LibroRepository(private val libroDao: LibroDao) {
         return libroDao.getLibro(id)
     }
 
-
     // Borrar un libro
     suspend fun eliminarLibro(libro: Libro) {
         libroDao.delete(libro)
@@ -28,10 +27,7 @@ class LibroRepository(private val libroDao: LibroDao) {
         libroDao.update(libro)
     }
 
-
     fun filtrarLibros(titulo: String?, autor: String?): Flow<List<Libro>> =
         libroDao.filtrarLibros(titulo, autor)
-
-
 
 }
