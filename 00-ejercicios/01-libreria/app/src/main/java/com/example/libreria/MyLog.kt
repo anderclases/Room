@@ -11,20 +11,26 @@ object MyLog {
 
     private const val PREFIX = "[MyApp] "
 
+
+
     private fun caller(): String {
         val trace = Throwable().stackTrace
 
-        // Buscar el primer método que no sea interno de Compose ni de MyLog
         val frame = trace.firstOrNull { element ->
-            !element.className.startsWith("kotlin")
-                    && !element.className.startsWith("android")
-                    && !element.className.startsWith("java")
-                    && !element.className.startsWith("androidx.compose")
-                    && !element.className.contains("MyLog")
+            element.className.startsWith("com.example.libreria") &&
+                    !element.className.contains("MyLog")
         }
 
-        return frame?.methodName ?: "Unknown"
+        val className = frame?.className?.substringAfterLast('.')?.substringBefore('$')
+            ?: "UnknownClass"
+
+        val file = frame?.fileName ?: "Unknown.kt"
+        val line = frame?.lineNumber ?: -1
+
+        return "($file:$line)"
     }
+
+
 
     fun d(message: String) {
         Log.d(caller(), PREFIX + message)

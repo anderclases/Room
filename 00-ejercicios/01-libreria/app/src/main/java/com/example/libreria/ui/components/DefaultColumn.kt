@@ -1,4 +1,4 @@
-package com.example.libreria.ventanas
+package com.example.libreria.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

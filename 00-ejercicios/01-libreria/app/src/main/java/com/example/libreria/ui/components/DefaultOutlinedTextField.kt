@@ -1,4 +1,4 @@
-package com.example.libreria.ventanas
+package com.example.libreria.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 fun DefaultOutlinedTextField(
     texto: String,
     onTextoChange: (String) -> Unit,
-    placeholder: String = "Buscar por título o autor"
+    placeholder: String = "placeholder"
 ) {
     OutlinedTextField(
         value = texto,
@@ -22,6 +22,7 @@ fun DefaultOutlinedTextField(
             .fillMaxWidth()
             .padding(vertical = 8.dp),
         placeholder = { Text(placeholder) },
+        label = { Text(placeholder) },
         singleLine = true
     )
 }
