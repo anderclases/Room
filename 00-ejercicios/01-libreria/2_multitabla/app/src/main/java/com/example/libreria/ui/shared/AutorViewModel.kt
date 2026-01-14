@@ -1,6 +1,7 @@
 package com.example.libreria.ui.shared
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -21,6 +22,9 @@ class AutorViewModel(
 
     var nombre by mutableStateOf("")
         private set
+
+    var idSelector by mutableStateOf("")
+
     var nacionalidad by mutableStateOf("")
         private set
     var fechaNacimiento by mutableStateOf("")

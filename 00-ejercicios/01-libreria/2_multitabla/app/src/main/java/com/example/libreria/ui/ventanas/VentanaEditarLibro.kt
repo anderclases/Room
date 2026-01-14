@@ -32,10 +32,9 @@ fun VentanaEditarLibro(navController: NavController, modifier: Modifier, libroVi
         LibroForm(
             labelVentana = "Añadir Nuevo Libro",
             titulo = libroViewModel.titulo,
-            autor = libroViewModel.autor_id.toString(),
             publicacion = libroViewModel.publicacion,
             onTituloChange = { libroViewModel.onTituloChanged(it) },
-            onAutorChange = { autorViewModel.onNombreChanged(it) },
+            onAutorChange = { libroViewModel.onAutor_idChanged(it) },
             onPublicacionChange = { libroViewModel.onPublicacionChanged(it) },
             onAceptarClick = clickEditarLibro,
             onCancelarClick = { navController.popBackStack() },

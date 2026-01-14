@@ -5,6 +5,7 @@ import com.example.libreria.AutorDao
 import com.example.libreria.Categoria
 import com.example.libreria.CategoriaDao
 import com.example.libreria.Libro
+import com.example.libreria.MyLog
 import com.example.libreria.data.dao.LibroDao
 import com.example.libreria.data.entity.VistaLibroCompleto
 import kotlinx.coroutines.flow.Flow
@@ -36,6 +37,7 @@ class LibreriaRepository(
 
     // Borrar un libro
     suspend fun eliminarLibro(libro: Libro) {
+        MyLog.d("LibreriaRepository, va a llamar al dao")
         libroDao.delete(libro)
     }
 

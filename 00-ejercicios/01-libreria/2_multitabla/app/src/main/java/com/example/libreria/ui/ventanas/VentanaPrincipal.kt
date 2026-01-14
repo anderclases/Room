@@ -54,8 +54,9 @@ fun VentanaPrincipal(
 
     // Diálogo de confirmación
     if (libroAEliminar != null) {
-        MyLog.d("Se va a eliminar")
+        MyLog.d("Muestra ventana emergente de eliminar")
         MyLog.d("id libro: ${libroAEliminar!!.id}")
+        var idLibroEliminar = libroAEliminar!!.id
         AlertDialog(
             onDismissRequest = { libroAEliminar = null },
             title = { Text("Eliminar libro") },
@@ -64,7 +65,9 @@ fun VentanaPrincipal(
                 TextButton(
                     onClick = {
                         uiScope.launch {
-                            viewModel.eliminarLibro(libroAEliminar!!)
+                            MyLog.d("Se va pulsado aceptar en la ventana emergente de eliminacion")
+                            //viewModel.eliminarLibro(libroAEliminar!!) // puede dar null pointer por culpa de la recomposicion de la variable
+                            viewModel.eliminarLibroConId(idLibroEliminar)
                         }
                         libroAEliminar = null
                     }
@@ -131,9 +134,11 @@ fun VentanaPrincipal(
                     vista = vista,
                     onEditClick = { libroSeleccionado ->
                         navController.navigate("editarLibro/${libroSeleccionado.id}")
+                        MyLog.d("Boton editarLibro: ${libroSeleccionado.id},${libroSeleccionado.titulo}")
                     },
                     onDeleteClick = { libroSeleccionado ->
                         libroAEliminar = libroSeleccionado
+                        MyLog.d("Boton eliminarLibro: ${libroSeleccionado.id},${libroSeleccionado.titulo}")
                     }
                 )
             }

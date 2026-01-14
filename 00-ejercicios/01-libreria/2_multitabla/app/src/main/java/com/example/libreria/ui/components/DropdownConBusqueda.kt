@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -36,10 +35,11 @@ suspend fun <T> Flow<List<T>>.flowToSimpleList(): List<T> {
 
 
 @Composable
-fun AutorDropdownConBusqueda(
-    autores: List<Autor>,
-    autorIdSeleccionado: String?,
-    onAutorSeleccionado: (String) -> Unit,
+fun DropdownConBusqueda(
+    listaDatos: List<Autor>,
+    idDatoSeleccionado: String?, // Estado actual del dato elegido
+    onDatoSeleccionado: (String) -> Unit, // Para actualizar la seleccion del dato del dropdown
+    idDatoDatabase: (Int) -> Unit, // devuelve el id real del dato en base de datos
     label: String = "Autor"
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -47,12 +47,12 @@ fun AutorDropdownConBusqueda(
     var textFieldSize by remember { mutableStateOf(Size.Zero) }
     val density = LocalDensity.current
 
-    val autorNombre = autores.firstOrNull { it.id.toString() == autorIdSeleccionado }?.nombre ?: ""
+    val autorNombre = listaDatos.firstOrNull { it.id.toString() == idDatoSeleccionado }?.nombre ?: ""
 
     // Filtrado simple (case-insensitive)
-    val filtrados = remember(query, autores) {
+    val filtrados = remember(query, listaDatos) {
         val q = query.trim().lowercase()
-        if (q.isEmpty()) autores else autores.filter { it.nombre.lowercase().contains(q) }
+        if (q.isEmpty()) listaDatos else listaDatos.filter { it.nombre.lowercase().contains(q) }
     }
 
     Box(modifier = Modifier.fillMaxWidth()) {
@@ -99,12 +99,13 @@ fun AutorDropdownConBusqueda(
                     enabled = false
                 )
             } else {
-                filtrados.forEach { autor ->
+                filtrados.forEachIndexed { index, autor ->
                     DropdownMenuItem(
                         text = { Text(autor.nombre) },
                         onClick = {
-                            MyLog.d("onAutorSeleccionado: ${autor.nombre}")
-                            onAutorSeleccionado(autor.nombre)
+                            MyLog.d("onAutorSeleccionado: ${autor.nombre} ${autor.id}")
+                            onDatoSeleccionado(index.toString()) // quiero el id del dropdown no del objeto
+                            idDatoDatabase(autor.id)
                             expanded = false
                             query = "" // limpia la búsqueda
                         }

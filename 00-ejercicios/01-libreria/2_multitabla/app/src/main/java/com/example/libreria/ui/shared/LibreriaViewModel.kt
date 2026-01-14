@@ -108,8 +108,12 @@ class LibreriaViewModel(
     // --- OPERACIONES BASE DE DATOS ---
 
     suspend fun eliminarLibro(libro: Libro){
-        MyLog.d("Solicitud eliminar")
+        MyLog.d("LibreriaViewModel.eliminarLibro: ${libro}")
         repositorio.eliminarLibro(libro)
+    }
+    suspend fun eliminarLibroConId(libroId: Int){
+        MyLog.d("LibreriaViewModel.eliminarLibroConId: ${libroId}")
+        repositorio.eliminarLibro(Libro(id=libroId, "",0,0,0))
     }
 
     fun insertarDatosPrueba() {

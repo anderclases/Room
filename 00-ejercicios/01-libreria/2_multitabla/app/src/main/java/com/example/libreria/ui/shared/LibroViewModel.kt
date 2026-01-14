@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.libreria.Libro
+import com.example.libreria.MyLog
 import com.example.libreria.data.LibreriaRepository
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -36,6 +37,10 @@ class LibroViewModel(
         publicacion = nuevoTexto
         if (errorMensaje != null) errorMensaje = null
     }
+    fun onAutor_idChanged(nuevoNum: Int) {
+        autor_id = nuevoNum
+        if (errorMensaje != null) errorMensaje = null
+    }
 
     // LIMPIEZA DE ATRIBUTOS
     private fun limpiarFormulario() {
@@ -52,6 +57,7 @@ class LibroViewModel(
 
     // --- OPERACIONES BASE DE DATOS ---
     fun guardarLibro(onSuccess: () -> Unit) {
+        MyLog.d("Se va a guardar un libro ${titulo},${autor_id},${publicacion}")
         // 1. Validación básica
         if (titulo.isBlank() || autor_id==0) {
             errorMensaje = "Por favor, completa todos los campos"
