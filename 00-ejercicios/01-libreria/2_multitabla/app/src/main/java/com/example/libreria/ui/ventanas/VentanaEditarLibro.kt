@@ -8,20 +8,21 @@ import androidx.navigation.NavController
 import com.example.libreria.MyLog
 import com.example.libreria.ui.components.DefaultColumn
 import com.example.libreria.ui.components.LibroForm
+import com.example.libreria.ui.shared.AutorViewModel
 import com.example.libreria.ui.shared.LibreriaViewModel
 import com.example.libreria.ui.shared.LibroViewModel
 
 
 @Composable
-fun VentanaEditarLibro(navController: NavController, modifier: Modifier, viewModel: LibroViewModel, id:Int) {
+fun VentanaEditarLibro(navController: NavController, modifier: Modifier, libroViewModel: LibroViewModel,autorViewModel: AutorViewModel, id:Int) {
     val clickEditarLibro = {
-        MyLog.d("Se va a editar el libro: ${viewModel.titulo},${viewModel.autor},${viewModel.publicacion}")
-        viewModel.editarLibro(id) {
+        MyLog.d("Se va a editar el libro: titulo:${libroViewModel.titulo}, id_autor:${libroViewModel.autor_id}, añoPubli: ${libroViewModel.publicacion}")
+        libroViewModel.editarLibro(id) {
             navController.popBackStack()
         }
     }
     LaunchedEffect(id) {
-        viewModel.observarLibro(id)
+        libroViewModel.observarLibro(id)
     }
 
 
@@ -30,14 +31,15 @@ fun VentanaEditarLibro(navController: NavController, modifier: Modifier, viewMod
 
         LibroForm(
             labelVentana = "Añadir Nuevo Libro",
-            titulo = viewModel.titulo,
-            autor = viewModel.autor,
-            publicacion = viewModel.publicacion,
-            onTituloChange = { viewModel.onTituloChanged(it) },
-            onAutorChange = { viewModel.onAutorChanged(it) },
-            onPublicacionChange = { viewModel.onPublicacionChanged(it) },
+            titulo = libroViewModel.titulo,
+            autor = libroViewModel.autor_id.toString(),
+            publicacion = libroViewModel.publicacion,
+            onTituloChange = { libroViewModel.onTituloChanged(it) },
+            onAutorChange = { autorViewModel.onNombreChanged(it) },
+            onPublicacionChange = { libroViewModel.onPublicacionChanged(it) },
             onAceptarClick = clickEditarLibro,
-            onCancelarClick = { navController.popBackStack() }
+            onCancelarClick = { navController.popBackStack() },
+            autorViewModel = autorViewModel
         )
     }
 }

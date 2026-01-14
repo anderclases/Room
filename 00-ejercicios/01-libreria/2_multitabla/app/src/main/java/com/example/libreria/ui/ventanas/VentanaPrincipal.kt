@@ -41,7 +41,7 @@ fun VentanaPrincipal(
     //var filtroAutor by remember  {mutableStateOf("")}
 
     //val libros by viewModel.todosLosLibros.collectAsState(initial = emptyList())
-    val libros by viewModel.librosFiltrados.collectAsState()
+    val listaLibrosFiltrados by viewModel.librosFiltrados.collectAsState()
     val uiScope = rememberCoroutineScope()
 
     var libroAEliminar by remember { mutableStateOf<Libro?>(null) }
@@ -56,7 +56,6 @@ fun VentanaPrincipal(
     if (libroAEliminar != null) {
         MyLog.d("Se va a eliminar")
         MyLog.d("id libro: ${libroAEliminar!!.id}")
-        val libroEliminarId = libroAEliminar!!.id
         AlertDialog(
             onDismissRequest = { libroAEliminar = null },
             title = { Text("Eliminar libro") },
@@ -65,7 +64,7 @@ fun VentanaPrincipal(
                 TextButton(
                     onClick = {
                         uiScope.launch {
-                            viewModel.eliminarLibro(libroEliminarId)
+                            viewModel.eliminarLibro(libroAEliminar!!)
                         }
                         libroAEliminar = null
                     }
@@ -83,16 +82,22 @@ fun VentanaPrincipal(
     DefaultColumn(modifier = modifier) {
         Text("VentanaPrincipal")
 
-        Button({ viewModel.insertarDatosPrueba() }) { Text("Insertar datos de prueba") }
+        Button({ viewModel.insertarDatosPrueba() }) { Text("Insert pruebas") }
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Button(onClick = {
-                MyLog.d("Boton Crear")
-                navController.navigate("crear")
+                MyLog.d("Boton crear libro")
+                navController.navigate("crearLibro")
             }) {
                 Text("Añadir libro")
+            }
+            Button(onClick = {
+                MyLog.d("Boton crear autor")
+                navController.navigate("crearAutor")
+            }) {
+                Text("Añadir autor")
             }
             Button(onClick = {
                 MyLog.d("Boton aplicarFiltros")
@@ -121,9 +126,9 @@ fun VentanaPrincipal(
                 LibroItemHeader()
             }
             // Carga de filas y funciones eliminar y editar
-            items(libros) { libro ->
+            items(listaLibrosFiltrados) { vista ->
                 LibroItem(
-                    libro = libro,
+                    vista = vista,
                     onEditClick = { libroSeleccionado ->
                         navController.navigate("editarLibro/${libroSeleccionado.id}")
                     },

@@ -15,10 +15,8 @@ import com.example.libreria.data.LibreriaRepository
 import com.example.libreria.ui.shared.AutorViewModel
 import com.example.libreria.ui.shared.LibreriaViewModel
 import com.example.libreria.ui.shared.LibroViewModel
-import com.example.libreria.ui.ventanas.VentanaCrear
 import com.example.libreria.ui.ventanas.VentanaCrearAutor
 import com.example.libreria.ui.ventanas.VentanaCrearLibro
-import com.example.libreria.ui.ventanas.VentanaEditar
 import com.example.libreria.ui.ventanas.VentanaEditarLibro
 import com.example.libreria.ui.ventanas.VentanaPrincipal
 
@@ -26,7 +24,11 @@ import com.example.libreria.ui.ventanas.VentanaPrincipal
 fun GestorVentanas(modifier: Modifier) {
     val context = LocalContext.current
 
-    val repositorio = LibreriaRepository(LibreriaDatabase.getDatabase(context).libroDao())
+    val repositorio = LibreriaRepository(
+        LibreriaDatabase.getDatabase(context).libroDao(),
+        LibreriaDatabase.getDatabase(context).autorDao(),
+        LibreriaDatabase.getDatabase(context).categoriaDao()
+        )
 
 
     class MultiViewModelFactory(
@@ -35,7 +37,7 @@ fun GestorVentanas(modifier: Modifier) {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             val creator = creators[modelClass] ?: creators.entries.firstOrNull {
                 modelClass.isAssignableFrom(it.key)
-            }?.value ?: throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
+            }?.value ?: throw IllegalArgumentException("Error en GestorVentanas. Unknown ViewModel class: ${modelClass.name}")
             return creator() as T
         }
     }
@@ -43,7 +45,7 @@ fun GestorVentanas(modifier: Modifier) {
 
     val factory = MultiViewModelFactory(
         mapOf(
-            LibroViewModel::class.java to { LibreriaViewModel(repositorio) },
+            LibreriaViewModel::class.java to { LibreriaViewModel(repositorio) },
             LibroViewModel::class.java to { LibroViewModel(repositorio) },
             AutorViewModel::class.java to { AutorViewModel(repositorio) }
         )
@@ -65,11 +67,11 @@ fun GestorVentanas(modifier: Modifier) {
             )
         ) { backStackEntry ->
             val id = backStackEntry.arguments?.getInt("id") ?: 0
-            VentanaEditarLibro(navController, modifier, libroViewModel, id)
+            VentanaEditarLibro(navController, modifier, libroViewModel,autorViewModel, id)
         }
 
         composable("principal") { VentanaPrincipal(navController, modifier, libreriaViewModel) }
-        composable("crearLibro") { VentanaCrearLibro(navController, modifier, libroViewModel) }
+        composable("crearLibro") { VentanaCrearLibro(navController, modifier, libroViewModel,autorViewModel) }
         composable("crearAutor") { VentanaCrearAutor(navController, modifier, autorViewModel) }
     }
 }

@@ -7,30 +7,32 @@ import androidx.navigation.NavController
 import com.example.libreria.MyLog
 import com.example.libreria.ui.components.DefaultColumn
 import com.example.libreria.ui.components.LibroForm
+import com.example.libreria.ui.shared.AutorViewModel
 import com.example.libreria.ui.shared.LibroViewModel
 
 @Composable
-fun VentanaCrearLibro(navController: NavController, modifier: Modifier, viewModel: LibroViewModel) {
+fun VentanaCrearLibro(navController: NavController, modifier: Modifier, libroViewModel: LibroViewModel,autorViewModel: AutorViewModel) {
 
     val clickGuardarLibro = {
-        MyLog.d("clickGuardarLibro, Se va a crear el libro: "+ viewModel.titulo)
-        viewModel.guardarLibro {
+        MyLog.d("clickGuardarLibro, Se va a crear el libro: "+ libroViewModel.titulo)
+        libroViewModel.guardarLibro {
             navController.popBackStack()
         }
     }
 
     DefaultColumn(modifier = modifier) {
-        Text(text = "VentanaCrear")
+        Text(text = "VentanaCrearLibro")
         LibroForm(
             labelVentana = "Añadir Nuevo Libro",
-            titulo = viewModel.titulo,
-            autor = viewModel.autor,
-            publicacion = viewModel.publicacion,
-            onTituloChange = { viewModel.onTituloChanged(it) },
-            onAutorChange = { viewModel.onAutorChanged(it) },
-            onPublicacionChange = { viewModel.onPublicacionChanged(it) },
+            titulo = libroViewModel.titulo,
+            autor = libroViewModel.autor_id.toString(),
+            publicacion = libroViewModel.publicacion,
+            onTituloChange = { libroViewModel.onTituloChanged(it) },
+            onAutorChange = { autorViewModel.onNombreChanged(it) },
+            onPublicacionChange = { libroViewModel.onPublicacionChanged(it) },
             onAceptarClick = clickGuardarLibro,
-            onCancelarClick = { navController.popBackStack() }
+            onCancelarClick = { navController.popBackStack() },
+            autorViewModel = autorViewModel
         )
     }
 }

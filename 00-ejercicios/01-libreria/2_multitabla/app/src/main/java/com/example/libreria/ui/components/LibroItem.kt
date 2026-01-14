@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.libreria.Libro
+import com.example.libreria.data.entity.VistaLibroCompleto
 
 // Define anchos fijos por columna (ajústalos a tu gusto/maqueta)
 private val TITLE_WIDTH = 90.dp
@@ -77,7 +78,7 @@ fun LibroItemHeader() {
 
 @Composable
 fun LibroItem(
-    libro: Libro,
+    vista: VistaLibroCompleto,
     onEditClick: (Libro) -> Unit,
     onDeleteClick: (Libro) -> Unit
 ) {
@@ -94,7 +95,7 @@ fun LibroItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = libro.titulo,
+                text = vista.libro.titulo,
                 modifier = Modifier.width(TITLE_WIDTH),
                 style = MaterialTheme.typography.bodyLarge.copy(
                     lineBreak = LineBreak.Paragraph,
@@ -102,12 +103,12 @@ fun LibroItem(
                 ),
                 softWrap = true,
                 textAlign = TextAlign.Center
-                // Si AÚN quieres limitar líneas, usa un número >1:
+                // Si quieres limitar líneas, usa un número >1:
                 // maxLines = 2, overflow = TextOverflow.Ellipsis
             )
 
             Text(
-                text = libro.autor,
+                text = vista.autor.nombre,
                 modifier = Modifier.width(AUTHOR_WIDTH),
                 style = MaterialTheme.typography.bodyLarge.copy(
                     lineBreak = LineBreak.Paragraph,
@@ -118,7 +119,7 @@ fun LibroItem(
             )
 
             Text(
-                text = "${libro.published}",
+                text = "${vista.libro.publicacion}",
                 modifier = Modifier.width(YEAR_WIDTH),
                 style = MaterialTheme.typography.bodyLarge,
                 softWrap = true,
@@ -129,13 +130,13 @@ fun LibroItem(
                 modifier = Modifier.width(ACTIONS_WIDTH),
                 horizontalArrangement = Arrangement.End
             ) {
-                IconButton(onClick = { onEditClick(libro) }) {
+                IconButton(onClick = { onEditClick(vista.libro) }) {
                     Icon(
                         imageVector = Icons.Filled.Edit,
                         contentDescription = "Editar libro"
                     )
                 }
-                IconButton(onClick = { onDeleteClick(libro) }) {
+                IconButton(onClick = { onDeleteClick(vista.libro) }) {
                     Icon(
                         imageVector = Icons.Filled.Delete,
                         contentDescription = "Eliminar libro",

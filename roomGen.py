@@ -148,7 +148,7 @@ interface {1}Dao {{
         SELECT * FROM {1}
         WHERE (:titulo IS NULL OR name LIKE '%' || :titulo || '%')
     """)
-    fun filtrarCoches(titulo: String?): Flow<List<{1}>>
+    fun filtrar{1}(titulo: String?): Flow<List<{1}>>
 }}
     '''.format(package,entityName,entityName.lower())
 

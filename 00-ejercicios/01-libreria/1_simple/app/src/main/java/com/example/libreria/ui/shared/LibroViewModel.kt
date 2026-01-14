@@ -93,7 +93,7 @@ class LibroViewModel(
         if (errorMensaje != null) errorMensaje = null
     }
 
-    // --- LÓGICA DE NEGOCIO ---
+    // --- INSERT Y EDITAR DATOS  ---
 
     fun guardarLibro(onSuccess: () -> Unit) {
         // 1. Validación básica

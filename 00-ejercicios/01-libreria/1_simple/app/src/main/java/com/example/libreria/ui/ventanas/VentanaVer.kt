@@ -223,7 +223,7 @@ fun LibroItem(
                 ),
                 softWrap = true,
                 textAlign = TextAlign.Center
-                // Si AÚN quieres limitar líneas, usa un número >1:
+                // Si quieres limitar líneas, usa un número >1:
                 // maxLines = 2, overflow = TextOverflow.Ellipsis
             )
 

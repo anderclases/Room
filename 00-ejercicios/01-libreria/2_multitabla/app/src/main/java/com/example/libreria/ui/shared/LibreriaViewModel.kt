@@ -5,20 +5,31 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.libreria.Autor
+import com.example.libreria.Categoria
 import com.example.libreria.Libro
 import com.example.libreria.MyLog
 import com.example.libreria.data.LibreriaRepository
+import com.example.libreria.data.entity.VistaLibroCompleto
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class LibreriaViewModel(
     private val repositorio: LibreriaRepository // Inyectamos el repositorio
 ) : ViewModel() {
     // Para el uso de la visualizacion de datos combinados, util para la ventana principal
-    private val _librosFiltrados = MutableStateFlow<List<Libro>>(emptyList())
-    val librosFiltrados: StateFlow<List<Libro>> = _librosFiltrados
+
+
+    private val _librosFiltrados = MutableStateFlow<List<VistaLibroCompleto>>(emptyList())
+    //Al abrirse el programa por primera vez se llama a la funcion todosLosLibros() y carga la lista.
+    // Cuando se llama a la funcion filtrarLibros se actualiza esta lista. Solo se llama al aplicarFiltros().
+
+    val librosFiltrados: StateFlow<List<VistaLibroCompleto>> = _librosFiltrados
+
 
     // Estado para manejar errores visuales
     var errorMensaje by mutableStateOf<String?>(null)
@@ -96,46 +107,41 @@ class LibreriaViewModel(
 
     // --- OPERACIONES BASE DE DATOS ---
 
-    /** Observa el libro por id y actualiza los campos del ViewModel continuamente */
-    fun observarLibro(id: Int) {
-        viewModelScope.launch {
-            try {
-                repositorio.getLibro(id)                // Flow<Libro>
-                    .distinctUntilChanged()             // evita actualizaciones idénticas
-                    .collect { libro ->
-                        tituloLibro = libro.titulo
-                        nombreAutor = libro.autor
-                        publicacion = libro.publicacion.toString()
-                    }
-            } catch (e: Exception) {
-                errorMensaje = "Error al observar libro: ${e.message}"
-            }
-        }
-    }
-
-    suspend fun eliminarLibro(libroId: Int){
+    suspend fun eliminarLibro(libro: Libro){
         MyLog.d("Solicitud eliminar")
-        repositorio.eliminarLibro(Libro(libroId))
+        repositorio.eliminarLibro(libro)
     }
 
     fun insertarDatosPrueba() {
         viewModelScope.launch {
-            val libros = listOf(
-                Libro(0, "Cien años de soledad", "García Márquez", 1967),
-                Libro(0, "El señor de los anillos", "Tolkien", 1954),
-                Libro(0, "1984", "George Orwell", 1949),
-                Libro(0, "El nombre del viento", "Patrick Rothfuss", 2007),
-                Libro(0, "Crónica de una muerte anunciada", "García Márquez", 1981),
-                Libro(0, "La sombra del viento", "Carlos Ruiz Zafón", 2001),
-                Libro(0, "Fahrenheit 451", "Ray Bradbury", 1953),
-                Libro(0, "Juego de tronos", "George R. R. Martin", 1996),
-                Libro(0, "El Principito", "Antoine de Saint-Exupéry", 1943),
-                Libro(0, "El Código Da Vinci", "Dan Brown", 2003)
-            )
+            runBlocking {
+                val categorias = listOf(
+                    Categoria(1, "Ficción", "Obras basadas en la imaginación con elementos narrativos inventados."),
+                    Categoria(2, "Distopía", "Sociedades imaginarias indeseables donde el control social es opresivo."),
+                    Categoria(3, "Sátira", "Uso del humor, la ironía o el ridículo para criticar vicios o instituciones."),
+                    Categoria(4,"Romance","Historias centradas en relaciones amorosas y vínculos emocionales.")
+                )
 
-            libros.forEach { libro ->
-                repositorio.insertarLibro(libro)
+                val autores = listOf(
+                    Autor(1, "Gabriel García Márquez", "Colombiana", "06/03/1927"),
+                    Autor(2, "George Orwell", "Británica", "25/06/1903"),
+                    Autor(3, "Jane Austen", "Británica", "16/12/1775"),
+                    Autor(4, "Iria G. Parente", "Española", "29/10/1993")
+                )
+                categorias.forEach { cat -> repositorio.insertarCategoria(cat) }
+                autores.forEach { aut -> repositorio.insertarAutor(aut) }
+                delay(500)
+                val libros = listOf(
+                    Libro(id=1, titulo="Cien Años de Soledad",  publicacion=1967, autor_id=1, categoria_id=1),
+                    Libro(id=2, titulo="1984",                  publicacion=1949, autor_id=2, categoria_id=2),
+                    Libro(id=3, titulo="Rebelión en la Granja", publicacion=1945, autor_id=2, categoria_id=3),
+                    Libro(id=4, titulo="Orgullo y Prejuicio",   publicacion=1813, autor_id=3, categoria_id=4),
+                    Libro(id=5, titulo="El orgullo del dragón", publicacion=2019, autor_id=4, categoria_id=1)
+                )
+                libros.forEach { libro -> repositorio.insertarLibro(libro) }
+
             }
+
         }
     }
 
