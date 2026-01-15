@@ -50,17 +50,15 @@ def roomGenerator():
     print("Inserta nombres de entidad:")
     entityList = solicitar_entidades()
 
-    for entity in entityList:
-        createFile(f"{entity}Dao.kt",generarDAO(package,entityList[0]))
-        createFile(f"{entity}.kt",generarEntity(package,entityList[0]))
-
-
-    createFile(f"{dbname}Database.kt",generarDatabase(package,dbname,entityList))
-    createFile(f"{dbname}ViewModel.kt",generarViewModel(package,dbname,entityList[0]))
-    createFile(f"app.build.gradle.kts",generarBuildGradleApp(package))
-    createFile(f"top.build.gradle.kts",generarBuildGradleTop())
-    createFile(f"{dbname}Repository.kt",generarRepository(package,dbname,entityList[0]))
-    createFile(f"MainActivity",generarMainActivity(package,dbname,entityList[0]))
+    for index, entity in enumerate(entityList):
+        createFile(f"{entity}Dao.kt",generarDAO(package,entityList[index]))
+        createFile(f"{entity}.kt",generarEntity(package,entityList[index]))
+        createFile(f"{dbname}Database.kt",generarDatabase(package,dbname,entityList))
+        createFile(f"{dbname}ViewModel.kt",generarViewModel(package,dbname,entityList[index]))
+        createFile(f"app.build.gradle.kts",generarBuildGradleApp(package))
+        createFile(f"top.build.gradle.kts",generarBuildGradleTop())
+        createFile(f"{dbname}Repository.kt",generarRepository(package,dbname,entityList[index]))
+        createFile(f"MainActivity",generarMainActivity(package,dbname,entityList[index]))
 
 
     
