@@ -1,4 +1,4 @@
-# 01-libreria Multitabla (Modelo Relacional Multitabla)
+# 03-libreria Multitabla Avanzada
 
 Se debe diseñar y crear una base de datos relacional para una librería. El objetivo es normalizar la información en tres tablas interconectadas para evitar la duplicidad de datos y mejorar la integridad de la información.
 
