@@ -10,6 +10,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -19,9 +21,8 @@ import androidx.navigation.navArgument
 import com.example.libreria.data.LibroRepository
 import com.example.libreria.ui.theme.LibreriaTheme
 import com.example.libreria.ui.shared.LibroViewModel
-import com.example.libreria.ui.ventanas.VentanaEditar
+import com.example.libreria.ui.ventanas.LibroForm
 import com.example.libreria.ui.ventanas.VentanaVer
-import com.example.libreria.ui.ventanas.VentanaCrear
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,9 +44,13 @@ fun gestorVentanas(modifier: Modifier) {
 
     val repositorio = LibroRepository(LibreriaDatabase.getDatabase(context).libroDao())
 
-    val factory = object : androidx.lifecycle.ViewModelProvider.Factory {
-        override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
-            return LibroViewModel(repositorio) as T
+    val factory = object : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(LibroViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return LibroViewModel(repositorio) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
 
@@ -55,17 +60,16 @@ fun gestorVentanas(modifier: Modifier) {
     NavHost(navController = navController, startDestination = "ver") {
 
         composable(
-            route = "editar/{id}",
+            route = "libroForm/{option}",
             arguments = listOf(
-                navArgument("id") { type = NavType.IntType }
+                navArgument("option") {type = NavType.StringType}
             )
         ) { backStackEntry ->
-            val id = backStackEntry.arguments?.getInt("id") ?: 0
-            VentanaEditar(navController, modifier, libroViewModel, id)
+            val option : String = backStackEntry.arguments?.getString("option") ?: "crear"
+            LibroForm(navController, modifier, libroViewModel, option)
         }
 
         composable("ver") { VentanaVer(navController, modifier, libroViewModel) }
-        composable("crear") { VentanaCrear(navController, modifier, libroViewModel) }
     }
 
 }

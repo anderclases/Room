@@ -1,5 +1,6 @@
 package com.example.libreria.ui.ventanas
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -22,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,6 +32,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextAlign
@@ -40,6 +43,7 @@ import com.example.libreria.MyLog
 import com.example.libreria.ui.components.DefaultColumn
 import com.example.libreria.ui.components.DefaultOutlinedTextField
 import com.example.libreria.ui.shared.LibroViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
@@ -59,59 +63,44 @@ fun VentanaVer(
     modifier: Modifier = Modifier,
     viewModel: LibroViewModel
 ) {
-    //var filtroTitulo by remember  {mutableStateOf("")}
-    //var filtroAutor by remember  {mutableStateOf("")}
-
-    //val libros by viewModel.todosLosLibros.collectAsState(initial = emptyList())
     val libros by viewModel.librosFiltrados.collectAsState()
     val uiScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
-    var libroAEliminar by remember { mutableStateOf<Libro?>(null) }
 
-    // Tu callback actual, ahora sólo prepara el diálogo:
-    val onDeleteClick: (Libro) -> Unit = { libroSeleccionado ->
-        libroAEliminar = libroSeleccionado
+    // FUNCIONES ELIMINAR, EDITAR Y CREAR
+    fun eliminarLibro(id: Int) {
+        MyLog.d("VentanaVer.eliminarLibro")
+        uiScope.launch {
+            viewModel.eliminarLibro(id)
+            Toast.makeText(context,"El libro ha sido eliminado",Toast.LENGTH_SHORT).show()
+        }
     }
 
-    // Diálogo de confirmación
-    if (libroAEliminar != null) {
-        MyLog.d("Se va a eliminar")
-        MyLog.d("id libro: ${libroAEliminar!!.id}")
-        val libroEliminarId = libroAEliminar!!.id
-        AlertDialog(
-            onDismissRequest = { libroAEliminar = null },
-            title = { Text("Eliminar libro") },
-            text = { Text("¿Seguro que deseas eliminar “${libroAEliminar!!.titulo}”? Esta acción no se puede deshacer.") },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        uiScope.launch {
-                            viewModel.eliminarLibro(libroEliminarId)
-                        }
-                        libroAEliminar = null
-                    }
-                ) { Text("Eliminar") }
-            },
-            dismissButton = {
-                TextButton(onClick = { libroAEliminar = null }) {
-                    Text("Cancelar")
-                }
-            }
-        )
+    fun editarLibro(id: Int) {
+        MyLog.d("VentanaVer.editarLibro")
+        uiScope.launch {
+            viewModel.observarLibro(id)
+            navController.navigate("libroForm/editar")
+        }
     }
 
+    fun crearLibro() {
+        MyLog.d("VentanaVer.crearLibro")
+        navController.navigate("libroForm/crear")
+    }
 
     DefaultColumn(modifier = modifier) {
         Text("VentanaVer")
 
         Button({ viewModel.insertarDatosPrueba() }) { Text("Insertar datos de prueba") }
+        // BOTONES
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Button(onClick = {
-                MyLog.d("Boton Crear")
-                navController.navigate("crear")
+                crearLibro()
             }) {
                 Text("Añadir libro")
             }
@@ -122,23 +111,18 @@ fun VentanaVer(
             { Text("Aplicar Filtros") }
         }
 
+        // FORMULARIOS
         DefaultOutlinedTextField(
             viewModel.filtroTitulo,
             { nuevoTitulo -> viewModel.onFiltroTituloChanged(nuevoTitulo) },
             "Titulo"
         )
-        DefaultOutlinedTextField(
-            viewModel.filtroAutor,
-            { nuevoAutor -> viewModel.onFiltroAutorChanged(nuevoAutor) },
-            "Autor"
-        )
 
+        // COLUMNA DE VISUALICACIÓN DE DATOS
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(16.dp)
         ) {
-
-            // Encabezado: MISMAS MEDIDAS QUE CADA FILA
             item {
                 Row(
                     modifier = Modifier
@@ -167,7 +151,6 @@ fun VentanaVer(
                         style = MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Center
                     )
-                    // Acciones: reservar ancho fijo para que no empuje columnas
                     Row(
                         modifier = Modifier.width(ACTIONS_WIDTH),
                         horizontalArrangement = Arrangement.End
@@ -185,10 +168,10 @@ fun VentanaVer(
                 LibroItem(
                     libro = libro,
                     onEditClick = { libroSeleccionado ->
-                        navController.navigate("editar/${libroSeleccionado.id}")
+                        editarLibro(libroSeleccionado.id)
                     },
                     onDeleteClick = { libroSeleccionado ->
-                        libroAEliminar = libroSeleccionado
+                        eliminarLibro(libroSeleccionado.id)
                     }
                 )
             }
@@ -223,12 +206,10 @@ fun LibroItem(
                 ),
                 softWrap = true,
                 textAlign = TextAlign.Center
-                // Si quieres limitar líneas, usa un número >1:
-                // maxLines = 2, overflow = TextOverflow.Ellipsis
             )
 
             Text(
-                text = libro.autor,
+                text = libro.autor_id.toString(),
                 modifier = Modifier.width(AUTHOR_WIDTH),
                 style = MaterialTheme.typography.bodyLarge.copy(
                     lineBreak = LineBreak.Paragraph,

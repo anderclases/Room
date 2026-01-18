@@ -28,6 +28,6 @@ class LibroRepository(private val libroDao: LibroDao) {
     }
 
     fun filtrarLibros(titulo: String?, autor: String?): Flow<List<Libro>> =
-        libroDao.filtrarLibros(titulo, autor)
+        libroDao.filtrarLibros(titulo)
 
 }
