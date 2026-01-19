@@ -4,13 +4,13 @@ Se debe diseñar y crear una base de datos para una librería. La base de datos 
 
 ## Descripción de las tablas: 
 
-### Libro
+La tabla **Libro** contiene los siguientes atributos
 - *id* (Int): identificador único del libro, de tipo entero y con incremento automático.
 - *título* (String): nombre del libro, de tipo texto.
 - *año de publicación* (String): año en el que el libro fue publicado, de tipo entero. 
-- *id_autor* (Int): 
+- *id_autor* (Int)
 
-### Autor
+Estos son los atributos de la tabla **Autor**
 - *id* (Int): identificador único del autor, de tipo entero y con incremento automático.
 - *nombre* (String): Nombre y apellidos del autor.
 - *Fecha de nacimiento* (String): Fecha de nacimiento del autor.
@@ -33,60 +33,38 @@ Para probar que el sistema funciona adecuadamente se han realizado pruebas con l
 | Orgullo y Prejuicio             | Jane Austen            | 1813               |
 | El orgullo del dragon           | iria G Parente         | 2019               |
 
-### CREATE (VentanaCrearAutor y VentanaCrearLibro)
-Una ventana especifica en la que se muestra un formulario para introducir información y crear nuevos libros.
+Realiza todas las **operaciones CRUD**:
 
+### CREATE ➕
+Al pulsar el botón añadir libro, se abre una ventana para que introduzcamos la información necesaria para crear un libro.
 
-### READ (VentanaVer)
-Sirve para realizar búsquedas de libros. Se puede mostrar un listado completo de los libros o este puede ser filtrado por contiene en el nombre o Autor.
-
-- Por defecto la ventana va a cargar todos los libros por orden alfabético.
-- Hay **dos textField** uno para el Autor otro para el titulo.
+### READ 👀
+- Por defecto la ventana va a cargar todos los libros.
+- Hay **un textField**. pero la búsqueda puede ser en base a dos parámetros, se acepta tanto la *titulo* cómo el *autor*.
 - Hay un **botón aplicar filtros** para que se apliquen los filtros solo si han sido completados.
-- si se aplican los filtros y el textField está vacio se tiene que mostrar la lista por defecto de la ventana.
+    - Búsqueda por modelo.
+    - Búsqueda por matricula.
+    - Si uno de los textField no está informado, no se aplica en la búsqueda.
 
-### UPDATE (VentanaEditarAutor y VentanaEditarLibro)
-- La lista de VentanaVer contiene un boton IconButton editar ✏️.
-- En la ventana editar se puede ver el mismo formulario para crear libros.
-- Hay dos opcciones rechazar y aceptar, en caso de haber aceptado los cambios, se actualiza la base de datos.
+### UPDATE ✏️
+- La lista de VentanaVer contiene un botón IconButton editar ✏️.
+- Al pulsar ese botón se abre un formulario completo con la información del libro.
+- Hay dos opciones rechazar y aceptar, en caso de haber aceptado los cambios, se actualiza la base de datos.
 
-### DELETE (VentanaVer)
-- La lista de VentanaVer contiene un boton IconButton eliminar 🗑️. 
-- Al pusarse sale un aviso, ¿desea eliminar el libro? 
-- Al aceptar se recarga la lista y ese libro ha sido eliminado de la base de datos.
+### DELETE 🗑️
+- La lista de VentanaVer contiene un boton IconButton eliminar 🗑️.
+- Al pulsarse se elimina el libro y se informa de que se ha eliminado.
 
-## Descripción de las ventanas
+---
+
+## Ventanas
+Las ventanas de las que dispone la App son las siguientes.
+
 ### VentanaVer
-La ventana central del proyecto.
+Ventana principal del sistema, tiene una tabla con toda la información.
 
-Está formada por 3 partes:
-- Botones de acción.
-- Formulario de filtros.
-- Tabla de resultados.
-
-#### Botones de acción.
-- Insert pruebas:  Inserta libros y autores para las pruebas.
-- Añadir libro: Navega a VentanaCrearLibro.
-- Añadir Autor: Navega a VentanaCrearAutor.
-- Aplicar filtros: 
-
-#### Formulario de filtros.
-Hay dos OutlinedTextField uno planteado para filtrar por titulo de libro y otro para filtrar por titulo de autor.
-
-#### Tabla de resultados.
-Una tabla en la que se muestran todos los libros o los resultados de las búsquedas filtradas.
-
-### VentanaCrearAutor
-
-
-### VentanaCrearLibro
-
-
-### VentanaEditarAuto
-
-
-### VentanaEditarLibro
-Formulario con el libro seleccionado y se pue
+## VentanalibroForm
+Sirve tanto para editar libros cómo para crearlos. Al fin y al cabo para ambos casos el formulario es el mismo, con la diferencia de que el el caso de edición se debe realizar una función update y el formulario debe mostrar toda la información ya completada por defecto.
 
 ## Diferencias respecto a 1_simple
 - **Botón de eliminación simplificado en VentanaVer**, ahora no pide confirmación de eliminación.

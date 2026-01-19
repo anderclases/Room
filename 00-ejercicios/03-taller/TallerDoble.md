@@ -36,6 +36,7 @@ Al pulsar el botón añadir coche, se abre una ventana para que introduzcamos la
 - Al pulsarse se elimina el coche y se informa de que se ha eliminado.
 
 ---
+
 ## Parte 2
 Para realizar este proyecto se recomienda copiar el proyecto anterior e implementar este, para asegurar que la parte 1 funciona.
 
