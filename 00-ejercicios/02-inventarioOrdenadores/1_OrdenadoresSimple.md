@@ -34,7 +34,7 @@ Una ventana específica en la que se muestra un formulario para introducir infor
 ### READ (VentanaVerLista)
 Sirve para realizar búsquedas de ordenadores. Se puede mostrar un listado completo de los ordenadores o este puede ser filtrado por contiene en el nombre o modelo.
 
-- Por defecto la ventana va a cargar los primeros 10 ordenadores por orden alfabético de la codificación.
+- Por defecto la ventana va a cargar los ordenadores por orden alfabético de la codificación.
 - Hay **dos textField**, uno para buscar por identificador y otro por modelo.
 - Hay un **botón aplicar filtros** para que se apliquen los filtros solo si han sido completados.
 - Si se aplican los filtros y el textField está vacío, se tiene que mostrar la lista por defecto de la ventana.
@@ -45,7 +45,6 @@ Sirve para realizar búsquedas de ordenadores. Se puede mostrar un listado compl
 - En la ventana editar se puede ver el mismo formulario para crear ordenadores.
 - Hay dos opciones: rechazar y aceptar. En caso de haber aceptado los cambios, se actualiza la base de datos.
 
-### DELETE (VentanaVer)
+### DELETE
 - La lista de VentanaVer contiene un botón **IconButton eliminar** 🗑️. 
-- Al pulsarse sale un aviso: ¿desea eliminar el ordenador?
-- Al aceptar, se recarga la lista y ese ordenador ha sido eliminado de la base de datos.
+- Al piilsar, se elimina el ordenador de la base de datos.
