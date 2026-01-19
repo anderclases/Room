@@ -12,7 +12,7 @@ abstract class LibreriaDatabase : RoomDatabase() {
         private var Instance: LibreriaDatabase? = null
 
         fun getDatabase(context: Context): LibreriaDatabase {
-            //context.deleteDatabase("Libreria_database")
+            context.deleteDatabase("Libreria_database")
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(context,
                     LibreriaDatabase::class.java,

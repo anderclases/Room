@@ -30,8 +30,7 @@ interface LibroDao {
     @Query("""
     SELECT * FROM libro
     WHERE (:titulo IS NULL OR titulo LIKE '%' || :titulo || '%')
-      AND (:autor IS NULL OR autor LIKE '%' || :autor || '%')
 """)
-    fun filtrarLibros(titulo: String?, autor: String?): Flow<List<Libro>>
+    fun filtrarLibros(titulo: String?): Flow<List<Libro>>
 
 }

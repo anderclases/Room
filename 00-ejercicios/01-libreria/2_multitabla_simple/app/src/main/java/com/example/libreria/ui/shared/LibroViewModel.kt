@@ -1,6 +1,7 @@
 package com.example.libreria.ui.shared
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -25,10 +26,15 @@ class LibroViewModel(
     val librosFiltrados: StateFlow<List<Libro>> = _librosFiltrados
 
     // Usamos mutableStateOf para que Compose reaccione a los cambios
+    var idLibro by mutableIntStateOf(0)
+        private set
+
     var titulo by mutableStateOf("")
         private set
 
     var autor by mutableStateOf("")
+        private set
+    var autorId by mutableStateOf("")
         private set
 
     var publicacion by mutableStateOf("")
@@ -88,6 +94,11 @@ class LibroViewModel(
         autor = nuevoTexto
         if (errorMensaje != null) errorMensaje = null
     }
+
+    fun onAutorIdChanged(nuevoTexto: String) {
+        autorId = nuevoTexto
+        if (errorMensaje != null) errorMensaje = null
+    }
     fun onPublicacionChanged(nuevoTexto: String) {
         publicacion = nuevoTexto
         if (errorMensaje != null) errorMensaje = null
@@ -96,9 +107,12 @@ class LibroViewModel(
     // --- INSERT Y EDITAR DATOS  ---
 
     fun guardarLibro(onSuccess: () -> Unit) {
+        MyLog.d("LibroViewModel.guardarLibro")
         // 1. Validación básica
-        if (titulo.isBlank() || autor.isBlank()) {
-            errorMensaje = "Por favor, completa todos los campos"
+        if (titulo.isBlank() || autorId.isBlank()) {
+            val msg = "Por favor, completa todos los campos, para guardar correctamente"
+            errorMensaje = msg
+            MyLog.e(msg)
             return
         }
 
@@ -107,7 +121,7 @@ class LibroViewModel(
             try {
                 val nuevoLibro = Libro(
                     titulo = titulo.trim(),
-                    autor = autor.trim(),
+                    autor_id = autorId.toInt(),
                     published = publicacion.toInt()
                 )
 
@@ -121,27 +135,23 @@ class LibroViewModel(
         }
     }
 
-    fun editarLibro(libroId: Int, onSuccess: () -> Unit) {
-        // 1. Validación básica
-        if (titulo.isBlank() || autor.isBlank()) {
-            errorMensaje = "Por favor, completa todos los campos"
+    fun editarLibro(onSuccess: () -> Unit) {
+        if (titulo.isBlank() || autorId.isBlank()) {
+            errorMensaje = "Por favor, completa todos los campos, para editar correctamente"
             return
         }
 
         viewModelScope.launch {
             try {
-                // 2. Construir el objeto actualizado manteniendo el id
                 val libroActualizado = Libro(
-                    id = libroId,
+                    id = idLibro,
                     titulo = titulo.trim(),
-                    autor = autor.trim(),
+                    autor_id = autorId.toInt(),
                     published = publicacion.toInt()
                 )
 
-                // 3. Actualizar en BD (debe existir en el repositorio/DAO)
                 repositorio.actualizarLibro(libroActualizado)
 
-                // 4. Notificar éxito y limpiar
                 onSuccess()
                 limpiarFormulario()
             } catch (e: Exception) {
@@ -166,8 +176,9 @@ class LibroViewModel(
                 repositorio.getLibro(id)                // Flow<Libro>
                     .distinctUntilChanged()             // evita actualizaciones idénticas
                     .collect { libro ->
+                        idLibro = libro.id
                         titulo = libro.titulo
-                        autor = libro.autor
+                        autorId = libro.autor_id.toString()
                         publicacion = libro.published.toString()
                     }
             } catch (e: Exception) {
@@ -182,21 +193,12 @@ class LibroViewModel(
     }
 
 
-
-
     fun insertarDatosPrueba() {
         viewModelScope.launch {
             val libros = listOf(
-                Libro(0, "Cien años de soledad", "García Márquez", 1967),
-                Libro(0, "El señor de los anillos", "Tolkien", 1954),
-                Libro(0, "1984", "George Orwell", 1949),
-                Libro(0, "El nombre del viento", "Patrick Rothfuss", 2007),
-                Libro(0, "Crónica de una muerte anunciada", "García Márquez", 1981),
-                Libro(0, "La sombra del viento", "Carlos Ruiz Zafón", 2001),
-                Libro(0, "Fahrenheit 451", "Ray Bradbury", 1953),
-                Libro(0, "Juego de tronos", "George R. R. Martin", 1996),
-                Libro(0, "El Principito", "Antoine de Saint-Exupéry", 1943),
-                Libro(0, "El Código Da Vinci", "Dan Brown", 2003)
+                Libro(0, "Cien años de soledad", 1, 1967),
+                Libro(0, "El señor de los anillos", 2, 1954),
+                Libro(0, "1984", 3, 1949),
             )
 
             libros.forEach { libro ->
