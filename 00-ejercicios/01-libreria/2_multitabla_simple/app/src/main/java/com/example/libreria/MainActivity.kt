@@ -18,6 +18,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.libreria.data.LibreriaDatabase
 import com.example.libreria.data.LibroRepository
 import com.example.libreria.ui.theme.LibreriaTheme
 import com.example.libreria.ui.shared.LibroViewModel
@@ -41,8 +42,10 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun gestorVentanas(modifier: Modifier) {
     val context = LocalContext.current
-
-    val repositorio = LibroRepository(LibreriaDatabase.getDatabase(context).libroDao())
+    val repositorio = LibroRepository(
+        LibreriaDatabase.getDatabase(context).libroDao(),
+        LibreriaDatabase.getDatabase(context).autorDao()
+        )
 
     val factory = object : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {

@@ -1,4 +1,4 @@
-package com.example.libreria
+package com.example.libreria.data
 
 import androidx.room.Dao
 import androidx.room.Delete

@@ -38,12 +38,11 @@ import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.libreria.Libro
+import com.example.libreria.data.Libro
 import com.example.libreria.MyLog
 import com.example.libreria.ui.components.DefaultColumn
 import com.example.libreria.ui.components.DefaultOutlinedTextField
 import com.example.libreria.ui.shared.LibroViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 

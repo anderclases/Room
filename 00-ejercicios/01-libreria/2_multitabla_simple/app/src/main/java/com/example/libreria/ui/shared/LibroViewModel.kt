@@ -6,14 +6,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.libreria.Libro
+import com.example.libreria.data.Libro
 import com.example.libreria.MyLog
+import com.example.libreria.data.Autor
 import com.example.libreria.data.LibroRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class LibroViewModel(
     private val repositorio: LibroRepository // Inyectamos el repositorio
@@ -198,12 +201,26 @@ class LibroViewModel(
             val libros = listOf(
                 Libro(0, "Cien años de soledad", 1, 1967),
                 Libro(0, "El señor de los anillos", 2, 1954),
-                Libro(0, "1984", 3, 1949),
+                Libro(0, "1984", 1, 1949),
             )
+            val autores = listOf(
+                Autor(0,"George Orwell","Eng","01/01/01"),
+                Autor(0,"George Orwell","Eng","01/01/01"),
+                Autor(0,"George Orwell","Eng","01/01/01")
+            )
+            runBlocking {
 
-            libros.forEach { libro ->
-                repositorio.insertarLibro(libro)
+                autores.forEach { autor ->
+                    repositorio.insertarAutor(autor)
+                }
+                delay(500)
+                libros.forEach { libro ->
+                    repositorio.insertarLibro(libro)
+                }
+
+
             }
+
         }
     }
 

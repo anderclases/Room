@@ -1,10 +1,12 @@
 package com.example.libreria.data
 
-import com.example.libreria.Libro
-import com.example.libreria.LibroDao
+import com.example.libreria.data.Autor
+import com.example.libreria.data.AutorDao
+import com.example.libreria.data.Libro
+import com.example.libreria.data.LibroDao
 import kotlinx.coroutines.flow.Flow
 
-class LibroRepository(private val libroDao: LibroDao) {
+class LibroRepository(private val libroDao: LibroDao,private val autorDao: AutorDao) {
 
     val todosLosLibros:Flow<List<Libro>> = libroDao.getAllLibros()
 
@@ -30,4 +32,7 @@ class LibroRepository(private val libroDao: LibroDao) {
     fun filtrarLibros(titulo: String?, autor: String?): Flow<List<Libro>> =
         libroDao.filtrarLibros(titulo)
 
+    suspend fun insertarAutor(autor: Autor) {
+        autorDao.insert(autor)
+    }
 }
